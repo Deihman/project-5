@@ -28,23 +28,6 @@
    <div class="container">
       <h1>ACP Brevet Times</h1>
       <p>This worksheet is for ACP-sanctioned brevets between 200 and 1000 kilometers.</p>
-      <!--
-            If there are any warnings or other messages from a prior
-            request to the server,
-            they appear above the rest of the content, just until the next
-            action.  (This is only on request/response transactions that
-            result in regenerating the page, not on every request.)
-            -->
-      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-      <ul class="flashes">
-         {% for message in messages %}
-         <li>{{ message }}</li>
-         {% endfor %}
-      </ul>
-      {% endif %}
-      {% endwith %}
-      <!-- Design on bootstrap grid -->
       <form role="form">
          <div class="row">
             <div class="col-md-4">

@@ -19,8 +19,6 @@ import logging
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
-client = MongoClient("mongodb://" + os.environ['MONGODB_HOSTNAME'], 27017)
-db = client.brevet
 
 ###
 # Pages
@@ -101,7 +99,7 @@ def _submit():
 
     pymongo_interface.store(item_doc)
 
-    return
+    return flask.jsonify({"stored": "yes"})
 
 @app.route("/_display")
 def _display():
