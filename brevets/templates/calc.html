@@ -70,6 +70,8 @@
                appropriate for something that really is a table, like this
                one.  We allocate it the full 12 columns of the bootstrap grid.
                -->
+         <button id="SUBMIT" onclick="submit_data($(this).parents('.control'))">Submit</button>
+         <button id="DISPLAY" onclick="display_data($(this).parents('.control'))">Display</button>
          <div class="row">
             <div class="col-md-12">
                <table class="control_time_table">
@@ -104,8 +106,10 @@
          <!-- row -->
       </form>
       <script type="text/javascript">
-         var SCRIPT_ROOT = {{ request.script_root| tojson | safe }};
+         var SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
          var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
+         var SUBMIT_URL = SCRIPT_ROOT + "/_submit";
+         var DISPLAY_URL = SCRIPT_ROOT + "/_display";
 
          // FIX ME!
          // Right now, only the kilometers are passed
@@ -138,6 +142,50 @@
             });
          }
 
+         function submit_data(control)
+         {
+            var km_field = control.find("input[name='km']");
+            var open_time_field = control.find("input[name='open']");
+            var close_time_field = control.find("input[name='close']");
+            var location_field = control.find("input[name='location']");
+
+            var km = km_field.val();
+            var open_time = open_time_field.val();
+            var close_time = close_time_field.val();
+            var location = location_field.val();
+
+            console.log("Storing data in mongo");
+
+            $.getJSON(SUBMIT_URL, {km: km, location: location, open_time: open_time, close_time: close_time}).done(
+               function (data)
+               {
+                  console.log("Data successfully stored");
+                  km_field.val("");
+                  open_time_field.val("");
+                  close_time_field.val("")
+                  location_field.val("");
+               }
+            );
+         }
+
+         function display_data(control)
+         {
+            var km_field = control.find("input[name='km']");
+            var location_field = control.find("input[name='location']");
+            var open_time_field = control.find("input[name='open']");
+            var close_time_field = control.find("input[name='close']");
+
+            console.log("Displaying data from mongo");
+
+            $.getJSON(DISPLAY_URL).done(
+               function(data)
+               {
+                  console.log("retrieved data")
+                  return;
+               }
+            );
+         }
+
          $(document).ready(function () {
             // Do the following when the page is finished loading
 
@@ -146,7 +194,7 @@
                   var miles = parseFloat($(this).val());
                   var km = (1.609344 * miles).toFixed(6);
                   console.log("Converted " + miles + " miles to " + km + " kilometers");
-                  var control_entry = $(this).parents(".control")
+                  var control_entry = $(this).parents(".control");
                   var target = control_entry.find("input[name='km']");
                   target.val(km);
                   // Then calculate times for this entry

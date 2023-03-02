@@ -9,6 +9,8 @@ from flask import request
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
 import config
+import pymongo_interface
+import os
 
 import logging
 
@@ -17,6 +19,8 @@ import logging
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
+client = MongoClient("mongodb://" + os.environ['MONGODB_HOSTNAME'], 27017)
+db = client.brevet
 
 ###
 # Pages
@@ -47,9 +51,12 @@ def _calc_times():
     """
     Calculates open/close times from miles, using rules
     described at https://rusa.org/octime_alg.html.
-    Expects one URL-encoded argument, the number of miles.
+    Expects three URL-encoded arguments: 
+        control km: a checkpoint's distance
+        brevet distance: the total distance of the brevet
+        start time: the start time of the brevet
     """
-    app.logger.debug("Got a JSON request")
+    app.logger.debug("Got a JSON request: /_calc_times")
     km = request.args.get('km', 999, type=float)
     brevet_dist_km = request.args.get('brevet_dist_km', 200, type=float)
     start_time = request.args.get('start_time', '2021-01-01T00:00', type=str)
@@ -66,6 +73,43 @@ def _calc_times():
     close_time = acp_times.close_time(km, brevet_dist_km, start_time_arrow).format('YYYY-MM-DDTHH:mm')
     result = {"open": open_time, "close": close_time}
     return flask.jsonify(result=result)
+
+
+@app.route("/_submit")
+def _submit():
+    """
+    adds the current inputs to a mongo database "brevet"
+    Expects three URL-encoded arguments:
+        control km: the checkpoint's distance
+        location: the checkpoint's location name
+        open time: the open time of the checkpoint
+        close time: the close time of the checkpoint
+    returns a jsonified true value if it reaches the end
+    """
+    app.logger.debug("Got a JSON request: /_submit")
+    km = request.args.get("km", 999, type=float)
+    location = request.args.get("location", "", type=str)
+    start_time = request.args.get("open_time", "", type=str)
+    close_time = request.args.get("close_time", "", type=str)
+
+    item_doc = {
+        "km": km,
+        "location": location,
+        "start_time": start_time,
+        "close_time": close_time
+    }
+
+    pymongo_interface.store(item_doc)
+
+    return
+
+@app.route("/_display")
+def _display():
+    app.logger.debug("Got a JSON request: /_display")
+
+    items = pymongo_interface.fetch()
+
+    
 
 
 #############
