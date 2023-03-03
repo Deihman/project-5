@@ -142,6 +142,12 @@
             $.getJSON(SUBMIT_URL, {km: km, location: location, start_time: start_time, brevet_dist_km: brevet_dist_km}).done(
                function (data)
                {
+                  var stored = data.result;
+                  if (stored.stored == "no")
+                  {
+                     console.log("nothing stored");
+                     return;
+                  }
                   console.log("Data successfully stored");
                   km_field.val("");
                   start_time_field.val("");
@@ -170,7 +176,6 @@
                   location_field.val(times.location);
                   start_time_field.val(moment(times.start_time).format("YYYY-MM-DDTHH:mm"));
                   brevet_dist_field.val(times.brevet_distance);
-                  return;
                }
             );
          }

@@ -88,10 +88,13 @@ def _submit():
     returns a jsonified true value if it reaches the end
     """
     app.logger.debug("Got a JSON request: /_submit")
-    km = request.args.get("km", 999, type=float)
+    km = request.args.get("km", -1, type=float)
     location = request.args.get("location", "", type=str)
     start_time = request.args.get("start_time", "", type=str)
-    brevet_dist_km = request.args.get("brevet_dist_km", 999, type=float)
+    brevet_dist_km = request.args.get("brevet_dist_km", -1, type=float)
+
+    if km == -1 or location == "" or start_time == "" or brevet_dist_km == -1:
+        return flask.jsonify(result={"stored": "no"})
 
     item_doc = {
         "km": km,
