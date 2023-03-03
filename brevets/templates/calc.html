@@ -129,13 +129,13 @@
          {
             var km_field = control.find("input[name='km']");
             var location_field = control.find("input[name='location']");
-            var start_time_field = control.find("input[name='start']");
-            var brevet_dist_field = control.find("input[name='close']");
+            var start_time_field = document.getElementById("begin_date");
+            var brevet_dist_field = document.getElementById('brevet_dist_km');
 
-            var km = km_field.val();
-            var location = location_field.val();
-            var start_time = start_time_field.val();
-            var brevet_dist = brevet_dist_field.val();
+            var km = km_field.value;
+            var location = location_field.value;
+            var start_time = start_time_field.value;
+            var brevet_dist = brevet_dist_field.value;
 
             console.log("Storing data in mongo");
 
@@ -155,8 +155,8 @@
          {
             var km_field = control.find("input[name='km']");
             var location_field = control.find("input[name='location']");
-            var open_time_field = control.find("input[name='open']");
-            var close_time_field = control.find("input[name='close']");
+            var start_time_field = document.getElementById("begin_date");
+            var brevet_dist_field = document.getElementById('brevet_dist_km');
 
             console.log("Displaying data from mongo");
 
@@ -164,6 +164,12 @@
                function(data)
                {
                   console.log("retrieved data")
+                  var times = data.result;
+                  
+                  km_field.val(times.km);
+                  location_field.val(times.location);
+                  start_time_field.val(moment(times.start_time).format("YYYY-MM-DDTHH:mm"));
+                  brevet_dist_field.val(times.brevet_distance);
                   return;
                }
             );

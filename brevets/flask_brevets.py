@@ -9,6 +9,7 @@ from flask import request
 import arrow  # Replacement for datetime, based on moment.js
 import acp_times  # Brevet time calculations
 import config
+from pymongo import MongoClient
 import pymongo_interface
 import os
 
@@ -19,6 +20,8 @@ import logging
 ###
 app = flask.Flask(__name__)
 CONFIG = config.configuration()
+client = MongoClient("mongodb://" + os.environ['MONGODB_HOSTNAME'], 27017)
+db = client.brevet
 
 ###
 # Pages
@@ -97,7 +100,7 @@ def _submit():
         "brevet_distance": brevet_dist_km
     }
 
-    pymongo_interface.store(item_doc)
+    pymongo_interface.store(item_doc, db)
 
     return flask.jsonify(result={"stored": "yes"})
 
@@ -105,11 +108,9 @@ def _submit():
 def _display():
     app.logger.debug("Got a JSON request: /_display")
 
-    items = pymongo_interface.fetch()
+    items = pymongo_interface.fetch(db)
 
     return flask.jsonify(result=items)
-
-    
 
 
 #############

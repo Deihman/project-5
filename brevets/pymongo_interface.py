@@ -1,13 +1,17 @@
-import os
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://" + os.environ['MONGODB_HOSTNAME'], 27017)
-db = client.brevet
+def store(item_dictionary:dict, database):
+    '''
+    stores a dictionary in the specified database
+    '''
+    database.insert_one(item_dictionary)
 
-def store(item_dictionary:dict):
-    db.insert_one(item_dictionary)
     return
 
-def fetch():
-    items = list(db.find({}, {"_id": 0}))
+def fetch(database):
+    '''
+    returns an object from the specified database in dictionary form
+    '''
+    items = database.find_one()
+
     return items
