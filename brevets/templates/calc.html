@@ -128,24 +128,24 @@
          function submit_data(control)
          {
             var km_field = control.find("input[name='km']");
-            var open_time_field = control.find("input[name='open']");
-            var close_time_field = control.find("input[name='close']");
             var location_field = control.find("input[name='location']");
+            var start_time_field = control.find("input[name='start']");
+            var brevet_dist_field = control.find("input[name='close']");
 
             var km = km_field.val();
-            var open_time = open_time_field.val();
-            var close_time = close_time_field.val();
             var location = location_field.val();
+            var start_time = start_time_field.val();
+            var brevet_dist = brevet_dist_field.val();
 
             console.log("Storing data in mongo");
 
-            $.getJSON(SUBMIT_URL, {km: km, location: location, open_time: open_time, close_time: close_time}).done(
+            $.getJSON(SUBMIT_URL, {km: km, location: location, start_time: start_time, brevet_dist_km: brevet_dist_km}).done(
                function (data)
                {
                   console.log("Data successfully stored");
                   km_field.val("");
-                  open_time_field.val("");
-                  close_time_field.val("")
+                  start_time_field.val("");
+                  brevet_dist_field.val("")
                   location_field.val("");
                }
             );
@@ -175,7 +175,7 @@
             $('input[name="miles"]').change(
                function () {
                   var miles = parseFloat($(this).val());
-                  var km = (1.609344 * miles).toFixed(6);
+                  var km = (1.609344 * miles).toFixed(5);
                   console.log("Converted " + miles + " miles to " + km + " kilometers");
                   var control_entry = $(this).parents(".control");
                   var target = control_entry.find("input[name='km']");
@@ -187,7 +187,7 @@
             $('input[name="km"]').change(
                function () {
                   var km = parseFloat($(this).val());
-                  var miles = (0.621371 * km).toFixed(6);
+                  var miles = (0.621371 * km).toFixed(5);
                   console.log("Converted " + km + " km to " + miles + " miles");
                   var control_entry = $(this).parents(".control")
                   var target = control_entry.find("input[name='miles']");

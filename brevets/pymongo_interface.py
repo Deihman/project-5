@@ -6,8 +6,8 @@ db = client.brevet
 
 def store(item_dictionary:dict):
     db.insert_one(item_dictionary)
-    return 1
+    return
 
 def fetch():
-    items = list(db.find_one())
+    items = list(db.find({}, {"_id": 0}))
     return items

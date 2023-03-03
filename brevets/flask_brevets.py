@@ -87,25 +87,27 @@ def _submit():
     app.logger.debug("Got a JSON request: /_submit")
     km = request.args.get("km", 999, type=float)
     location = request.args.get("location", "", type=str)
-    start_time = request.args.get("open_time", "", type=str)
-    close_time = request.args.get("close_time", "", type=str)
+    start_time = request.args.get("start_time", "", type=str)
+    brevet_dist_km = request.args.get("brevet_dist_km", 999, type=float)
 
     item_doc = {
         "km": km,
         "location": location,
         "start_time": start_time,
-        "close_time": close_time
+        "brevet_distance": brevet_dist_km
     }
 
     pymongo_interface.store(item_doc)
 
-    return flask.jsonify({"stored": "yes"})
+    return flask.jsonify(result={"stored": "yes"})
 
 @app.route("/_display")
 def _display():
     app.logger.debug("Got a JSON request: /_display")
 
     items = pymongo_interface.fetch()
+
+    return flask.jsonify(result=items)
 
     
 
