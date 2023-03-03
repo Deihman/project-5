@@ -93,7 +93,7 @@ def _submit():
     start_time = request.args.get("start_time", "", type=str)
     brevet_dist_km = request.args.get("brevet_dist_km", -1, type=float)
 
-    if km == -1 or location == "" or start_time == "" or brevet_dist_km == -1:
+    if km == -1 or start_time == "" or brevet_dist_km < 200:
         return flask.jsonify(result={"stored": "no"})
 
     item_doc = {
