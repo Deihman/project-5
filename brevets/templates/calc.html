@@ -315,12 +315,20 @@
                                         var checkpoint = $(this);
 
                                         checkpoint.find("input[name='km']").val('');
+                                        checkpoint.find("input[name='miles']").val('');
                                         checkpoint.find("input[name='location']").val('');
 
                                         if (index < num_checkpoints)
                                         {
                                             checkpoint.find("input[name='km']").val(checkpoints[index].input_km);
                                             checkpoint.find("input[name='location']").val(checkpoints[index].input_location);
+
+                                            var km = parseFloat(checkpoints[index].input_km);
+                                            var miles = (0.621371 * km).toFixed(5);
+                                            console.log("Converted " + km + " km to " + miles + " miles");
+                                            var target = checkpoint.find("input[name='miles']");
+                                            target.val(miles);
+
                                             calc_times(checkpoint)
                                         }
                                     });
