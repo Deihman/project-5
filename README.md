@@ -19,7 +19,20 @@ This version of the calculator adds `Submit` and `Display` buttons that are supp
 
 ## How to run
 
+In the home directory of the project, run the following command to set up the docker images and run the calculator. The `--build` tag forces the container to rebuild, which will be helpful if you have an older version of this project on your system. You may add the `-d` flag if you want to disconnect docker's prompting from your terminal. 
 
+```
+docker-compose up --build
+```
 
-To connect to the calculator, open up your browser and go to `localhost:5001`, replacing `5001` with your port. Play around with it as much as you want, and let me know if you find any issues.
+To connect to the calculator, open up your browser and go to `localhost:5001`. If you would like to  Play around with it as much as you want, and let me know if you find any issues.
 
+If you haven't disconnected your terminal from the internal containers, hitting `Crtl+C` will stop the containers. It will leave the outside container still running, but the program will not run anymore.
+
+To stop and disable every container in the project, type in the following command. 
+
+```
+docker-compose down
+```
+
+This will also stop the external container, killing the program entirely. 
