@@ -23,6 +23,8 @@ CONFIG = config.configuration()
 client = MongoClient("mongodb://" + os.environ['MONGODB_HOSTNAME'], 27017)
 db = client.brevet
 
+mongo_brevets = db.brevets
+
 ###
 # Pages
 ###
@@ -76,44 +78,72 @@ def _calc_times():
     return flask.jsonify(result=result)
 
 
-@app.route("/_submit")
+@app.route("/_submit", methods=["POST"])
 def _submit():
     """
     adds the current inputs to a mongo database "brevet"
     Expects three URL-encoded arguments:
-        control km: the checkpoint's distance
-        location: the checkpoint's location name
-        open time: the open time of the checkpoint
-        close time: the close time of the checkpoint
+        brevet_dist_km: the brevet's distance
+        start_time:     the brevet's start time
+        checkpoints:    a list of dictionaries containing 
+                        the km and location name of each 
+                        filled-in checkpoint
     returns a jsonified true value if it reaches the end
     """
-    app.logger.debug("Got a JSON request: /_submit")
-    km = request.args.get("km", -1, type=float)
-    location = request.args.get("location", "", type=str)
-    start_time = request.args.get("start_time", "", type=str)
-    brevet_dist_km = request.args.get("brevet_dist_km", -1, type=float)
 
-    if km == -1 or start_time == "" or brevet_dist_km < 200:
-        return flask.jsonify(result={"stored": "no"})
+    app.logger.debug("Got a POST request: /_submit")
 
-    item_doc = {
-        "km": km,
-        "location": location,
-        "start_time": start_time,
-        "brevet_distance": brevet_dist_km
-    }
+    try:
+        input_json = request.json
+        app.logger.debug("request received properly")
+        
+        brevet_dist_km = input_json["brevet_dist_km"]
+        start_time = input_json["start_time"]
+        checkpoints = input_json["checkpoints"]
+        app.logger.debug("Data assigned properly")
 
-    pymongo_interface.store(item_doc, db)
+        checkpoint_id = pymongo_interface.store(brevet_dist_km, start_time, checkpoints, mongo_brevets)
+        app.logger.debug("checkpoint id grabbed successfully")
 
-    return flask.jsonify(result={"stored": "yes"})
+        return flask.jsonify(
+            result={}, 
+            message="Inserted",
+            status=1,
+            mongo_id=checkpoint_id)
+
+    except:
+        return flask.jsonify(
+            result={},
+            message="Server error, not inserted",
+            status=0,
+            mongo_id='None')
+
 
 @app.route("/_display")
 def _display():
-    app.logger.debug("Got a JSON request: /_display")
+    """
+    pulls the newest brevet data from mongo database 'brevet'
+    and returns it to the HTML side of the project.
+    """
 
-    items = pymongo_interface.fetch(db)
+    try:
+        brevet_dist_km, start_time, checkpoints = pymongo_interface.fetch(mongo_brevets)
+        return flask.jsonify(
+            result={
+                "brevet_dist_km": brevet_dist_km,
+                "start_time": start_time,
+                "checkpoints": checkpoints
+            },
+            status=1,
+            message="Successfully fetched a brevet"
+        )
 
-    return flask.jsonify(result=items)
+    except:
+        return flask.jsonify(
+            result={},
+            status=0,
+            message="Something went wrong, couldn't fetch any brevets"
+        )
 
 
 #############
